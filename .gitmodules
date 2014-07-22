@@ -1,0 +1,3 @@
+[submodule "nedmalloc"]
+	path = nedmalloc
+	url = https://gerasim13@github.com/gerasim13/nedmalloc.git
