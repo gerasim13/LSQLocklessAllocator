@@ -234,21 +234,22 @@ static malloc_zone_t * malloc_ned_zone()
 
 //________________________________________________________________________________________
 
-CF_INLINE void * LSQMalloc (size_t size)
+inline void * LSQMalloc (size_t size)
 {
-    ___MALLOC(no, size);
-}
-CF_INLINE void * LSQCalloc (size_t no, size_t size)
-{
-    ___CALLOC(no, size);
+    return ___MALLOC(no, size);
 }
 
-CF_INLINE void * LSQRealloc(void *mem, size_t size)
+inline void * LSQCalloc (size_t no, size_t size)
 {
-    ___REALLOC(mem, size);
+    return ___CALLOC(no, size);
 }
 
-CF_INLINE void   LSQFree   (void *mem)
+inline void * LSQRealloc(void *mem, size_t size)
+{
+    return ___REALLOC(mem, size);
+}
+
+inline void LSQFree(void *mem)
 {
     ___FREE(mem);
 }

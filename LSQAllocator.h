@@ -31,10 +31,10 @@ CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
 CF_EXPORT void                   LSQAllocatorSetCurrentAllocator(CFAllocatorRef); // Allocator setter
 CF_EXPORT struct task_basic_info LSQAllocatorGetMemoryInfo();                     // Get memory info
 
-CF_INLINE void * LSQMalloc (size_t size);
-CF_INLINE void * LSQCalloc (size_t no, size_t size);
-CF_INLINE void * LSQRealloc(void *mem, size_t size);
-CF_INLINE void   LSQFree   (void *mem);
+CF_EXPORT void * LSQMalloc (size_t size);
+CF_EXPORT void * LSQCalloc (size_t no, size_t size);
+CF_EXPORT void * LSQRealloc(void *mem, size_t size);
+CF_EXPORT void   LSQFree   (void *mem);
 
 //________________________________________________________________________________________
 
