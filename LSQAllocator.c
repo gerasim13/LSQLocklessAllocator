@@ -6,10 +6,35 @@
 //  Copyright (c) 2013 Casual Underground. All rights reserved.
 //
 
-#include <stdio.h>
-#include <malloc/malloc.h>
 #include "LSQAllocator.h"
 #include "nedmalloc.h"
+
+//________________________________________________________________________________________
+
+CFAllocatorRef kLSQLocklessAllocator = NULL;
+
+//________________________________________________________________________________________
+
+#ifdef NEDMALLOC_H
+    #if defined(__cplusplus) && !defined(NO_NED_NAMESPACE)
+        #define ___MALLOC(no, size)   nedalloc::nedmalloc((size_t)size)
+        #define ___CALLOC(no, size)   nedalloc::nedcalloc((size_t)no, (size_t)size)
+        #define ___REALLOC(mem, size) nedalloc::nedrealloc(mem, (size_t)size)
+        #define ___FREE(mem)          nedalloc::nedfree(mem)
+    #else
+        #define ___MALLOC(no, size)   nedmalloc((size_t)size)
+        #define ___CALLOC(no, size)   nedcalloc((size_t)no, (size_t)size)
+        #define ___REALLOC(mem, size) nedrealloc(mem, (size_t)size)
+        #define ___FREE(mem)          nedfree(mem)
+    #endif
+#else
+    #define ___MALLOC(no, size)   malloc((size_t)size)
+    #define ___CALLOC(no, size)   calloc((size_t)no, (size_t)size)
+    #define ___REALLOC(mem, size) realloc(mem, (size_t)size)
+    #define ___FREE(mem)          free(mem)
+#endif
+
+//________________________________________________________________________________________
 
 #ifdef NEDMALLOC_H
 
@@ -203,11 +228,30 @@ static malloc_zone_t * malloc_ned_zone()
 	return (&__zone);
 }
 
+//________________________________________________________________________________________
+
 #endif
 
 //________________________________________________________________________________________
 
-CFAllocatorRef kLSQLocklessAllocator = NULL;
+CF_INLINE void * LSQMalloc (size_t size)
+{
+    ___MALLOC(no, size);
+}
+CF_INLINE void * LSQCalloc (size_t no, size_t size)
+{
+    ___CALLOC(no, size);
+}
+
+CF_INLINE void * LSQRealloc(void *mem, size_t size)
+{
+    ___REALLOC(mem, size);
+}
+
+CF_INLINE void   LSQFree   (void *mem)
+{
+    ___FREE(mem);
+}
 
 //________________________________________________________________________________________
 
@@ -304,4 +348,6 @@ __attribute__((constructor)) static void LSQAllocator(void)
         kLSQLocklessAllocator = NewLSQLocklessAllocator();
     });
 }
+
+//________________________________________________________________________________________
 
