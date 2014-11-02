@@ -54,7 +54,10 @@ LSQDESTRUCTOR  CF_EXPORT void   LSQFree   (void *mem);
 
 struct lsq_delete
 {
-    void operator()(void* x) { LSQFree(x); }
+    void operator()(void* x)
+    {
+        if (x) LSQFree(x), x = NULL;
+    }
 };
 
 #endif
