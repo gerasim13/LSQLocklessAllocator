@@ -7,7 +7,13 @@
 //
 
 #include "LSQAllocator.h"
+
+//________________________________________________________________________________________
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpointer-bool-conversion"
 #include "nedmalloc.h"
+#pragma clang diagnostic pop
 
 //________________________________________________________________________________________
 
