@@ -272,13 +272,14 @@ static CFStringRef LSQLocklessAllocatorCopyDescription(const void *info)
     return ret;
 }
 
-//static const void *	LSQLocklessAllocatorRetain(const void *info)
+//static const void * LSQLocklessAllocatorRetain(const void *info)
 //{
 //    return info;
 //}
 //
 //static void LSQLocklessAllocatorRelease(const void *info)
 //{
+//    return;
 //}
 
 static void * LSQLocklessAllocatorAllocate(CFIndex allocSize, CFOptionFlags hint, void *info)
@@ -309,7 +310,7 @@ static CFIndex LSQLocklessAllocatorPreferredSize(CFIndex size, CFOptionFlags hin
 CFAllocatorRef NewLSQLocklessAllocator()
 {
     #ifdef NEDMALLOC_H
-        neddisablethreadcache(0);
+        // neddisablethreadcache(0);
         // Create new malloc zone
         malloc_zone_t *allocatorZone = malloc_ned_zone();
     #else
@@ -320,8 +321,8 @@ CFAllocatorRef NewLSQLocklessAllocator()
     {
         0,
         (void*)allocatorZone,
-        NULL,
-        NULL,
+        NULL,//LSQLocklessAllocatorRetain,
+        NULL,//LSQLocklessAllocatorRelease,
         LSQLocklessAllocatorCopyDescription,
         LSQLocklessAllocatorAllocate,
         LSQLocklessAllocatorReallocate,
