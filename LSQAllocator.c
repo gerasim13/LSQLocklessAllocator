@@ -10,10 +10,13 @@
 
 //________________________________________________________________________________________
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpointer-bool-conversion"
-#include "nedmalloc.h"
-#pragma clang diagnostic pop
+// #define USE_DEFAULT_ALLOCATOR 0
+#if !USE_DEFAULT_ALLOCATOR
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wpointer-bool-conversion"
+    #include "nedmalloc.h"
+    #pragma clang diagnostic pop
+#endif
 
 //________________________________________________________________________________________
 
@@ -240,29 +243,9 @@ static malloc_zone_t * malloc_ned_zone()
 
 //________________________________________________________________________________________
 
-inline void * LSQMalloc (size_t size)
-{
-    return ___MALLOC(no, size);
-}
-
-inline void * LSQCalloc (size_t no, size_t size)
-{
-    return ___CALLOC(no, size);
-}
-
-inline void * LSQRealloc(void *mem, size_t size)
-{
-    return ___REALLOC(mem, size);
-}
-
-inline void LSQFree(void *mem)
-{
-    ___FREE(mem);
-}
-
-//________________________________________________________________________________________
-
 #pragma mark - CFAllocator Callbacks
+
+#if !USE_DEFAULT_ALLOCATOR
 
 static CFStringRef LSQLocklessAllocatorCopyDescription(const void *info)
 {
@@ -306,15 +289,20 @@ static CFIndex LSQLocklessAllocatorPreferredSize(CFIndex size, CFOptionFlags hin
     return zone->introspect->good_size(zone, size);
 }
 
+#endif
+
 // This function return pointer to lockless allocator
 CFAllocatorRef NewLSQLocklessAllocator()
 {
-    #ifdef NEDMALLOC_H
-        // neddisablethreadcache(0);
-        // Create new malloc zone
-        malloc_zone_t *allocatorZone = malloc_ned_zone();
+    #if USE_DEFAULT_ALLOCATOR
+    return CFAllocatorGetDefault();
     #else
-        malloc_zone_t *allocatorZone = malloc_default_zone();
+    #ifdef NEDMALLOC_H
+    // Create new malloc zone
+    neddisablethreadcache(0);
+    malloc_zone_t *allocatorZone = malloc_ned_zone();
+    #else
+    malloc_zone_t *allocatorZone = malloc_default_zone();
     #endif
     // Create allocator context
     CFAllocatorContext context =
@@ -331,6 +319,7 @@ CFAllocatorRef NewLSQLocklessAllocator()
     };
     // Create allocator
     return CFAllocatorCreate(kCFAllocatorUseContext, &context);
+    #endif
 }
 
 struct task_basic_info LSQAllocatorGetMemoryInfo()
@@ -342,6 +331,28 @@ struct task_basic_info LSQAllocatorGetMemoryInfo()
               (task_info_t)&info,
               &size);
     return info;
+}
+
+//________________________________________________________________________________________
+
+inline void * LSQMalloc (size_t size)
+{
+    return ___MALLOC(no, size);
+}
+
+inline void * LSQCalloc (size_t no, size_t size)
+{
+    return ___CALLOC(no, size);
+}
+
+inline void * LSQRealloc(void *mem, size_t size)
+{
+    return ___REALLOC(mem, size);
+}
+
+inline void LSQFree(void *mem)
+{
+    ___FREE(mem);
 }
 
 //________________________________________________________________________________________
