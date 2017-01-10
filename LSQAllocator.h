@@ -11,10 +11,10 @@
 
 //________________________________________________________________________________________
 
-#import <CoreFoundation/CoreFoundation.h>
-#import <malloc/malloc.h>
-#import <mach/mach.h>
-#import <stdio.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <malloc/malloc.h>
+#include <mach/mach.h>
+#include <stdio.h>
 
 //________________________________________________________________________________________
 
