@@ -7,10 +7,12 @@
 //
 
 #include "LSQAllocator.h"
+#include <cstdio>
+#include <cstdlib>
 
 //________________________________________________________________________________________
 
-// #define USE_DEFAULT_ALLOCATOR 0
+#define USE_DEFAULT_ALLOCATOR 0
 #if !USE_DEFAULT_ALLOCATOR
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wpointer-bool-conversion"
@@ -367,6 +369,22 @@ __attribute__((constructor)) static void LSQAllocator(void)
         kLSQLocklessAllocator = NewLSQLocklessAllocator();
     });
 }
+
+//________________________________________________________________________________________
+
+#ifdef NEDMALLOC_H
+
+void* operator new(std::size_t sz)
+{
+    return LSQMalloc(sz);
+}
+
+void operator delete(void* ptr) noexcept
+{
+    LSQFree(ptr);
+}
+
+#endif
 
 //________________________________________________________________________________________
 

@@ -11,21 +11,6 @@
 
 //________________________________________________________________________________________
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <malloc/malloc.h>
-#include <mach/mach.h>
-#include <stdio.h>
-
-//________________________________________________________________________________________
-
-CF_EXTERN_C_BEGIN
-
-//________________________________________________________________________________________
-
-CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
-
-//________________________________________________________________________________________
-
 #pragma mark - Macros
 
 #define LSQAllocatorAllocSize(size)    CFAllocatorAllocate(kLSQLocklessAllocator, size, 0);
@@ -35,6 +20,21 @@ CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
 
 #define LSQCONSTRUCTOR __attribute((ownership_returns(malloc)))
 #define LSQDESTRUCTOR  __attribute((ownership_takes(malloc, 1)))
+
+//________________________________________________________________________________________
+
+CF_EXTERN_C_BEGIN
+
+//________________________________________________________________________________________
+
+#include <CoreFoundation/CoreFoundation.h>
+#include <malloc/malloc.h>
+#include <mach/mach.h>
+#include <stdio.h>
+
+//________________________________________________________________________________________
+
+CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
 
 //________________________________________________________________________________________
 
@@ -50,7 +50,14 @@ LSQDESTRUCTOR  CF_EXPORT void   LSQFree   (void *mem);
 
 //________________________________________________________________________________________
 
+CF_EXTERN_C_END
+
+//________________________________________________________________________________________
+
 #if defined(__cplusplus)
+
+#include <cstdio>
+#include <cstdlib>
 
 struct lsq_delete
 {
@@ -61,10 +68,6 @@ struct lsq_delete
 };
 
 #endif
-
-//________________________________________________________________________________________
-
-CF_EXTERN_C_END
 
 //________________________________________________________________________________________
 
