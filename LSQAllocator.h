@@ -50,6 +50,25 @@ CF_EXPORT void * LSQRealloc(void *mem, size_t size);
 
 //________________________________________________________________________________________
 
+#if defined(__cplusplus)
+
+struct LSQAllocatorNewDelete
+{
+    void* operator new(std::size_t sz)
+    {
+        return LSQMalloc(sz);
+    }
+    
+    void operator delete(void* ptr) noexcept
+    {
+        LSQFree(ptr);
+    }
+};
+
+#endif
+
+//________________________________________________________________________________________
+
 CF_EXTERN_C_END
 
 //________________________________________________________________________________________
