@@ -11,6 +11,13 @@
 
 //________________________________________________________________________________________
 
+#include <CoreFoundation/CoreFoundation.h>
+#include <malloc/malloc.h>
+#include <mach/mach.h>
+#include <stdio.h>
+
+//________________________________________________________________________________________
+
 #pragma mark - Macros
 
 #define LSQAllocatorAllocSize(size)    CFAllocatorAllocate(kLSQLocklessAllocator, size, 0);
@@ -24,13 +31,6 @@
 //________________________________________________________________________________________
 
 CF_EXTERN_C_BEGIN
-
-//________________________________________________________________________________________
-
-#include <CoreFoundation/CoreFoundation.h>
-#include <malloc/malloc.h>
-#include <mach/mach.h>
-#include <stdio.h>
 
 //________________________________________________________________________________________
 
