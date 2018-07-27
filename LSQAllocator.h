@@ -18,6 +18,10 @@
 
 //________________________________________________________________________________________
 
+CF_EXTERN_C_BEGIN
+
+//________________________________________________________________________________________
+
 #pragma mark - Macros
 
 #define LSQAllocatorAllocSize(size)    CFAllocatorAllocate(kLSQLocklessAllocator, size, 0);
@@ -27,10 +31,6 @@
 
 #define LSQCONSTRUCTOR __attribute((ownership_returns(malloc)))
 #define LSQDESTRUCTOR  __attribute((ownership_takes(malloc, 1)))
-
-//________________________________________________________________________________________
-
-CF_EXTERN_C_BEGIN
 
 //________________________________________________________________________________________
 
@@ -46,28 +46,11 @@ CF_EXPORT struct task_basic_info LSQAllocatorGetMemoryInfo(void);               
 LSQCONSTRUCTOR CF_EXPORT void * LSQMalloc (size_t size);
 LSQCONSTRUCTOR CF_EXPORT void * LSQCalloc (size_t no, size_t size);
 LSQDESTRUCTOR  CF_EXPORT void   LSQFree   (void *mem);
-               CF_EXPORT void * LSQRealloc(void *mem, size_t size);
+CF_EXPORT void * LSQRealloc(void *mem, size_t size);
 
 //________________________________________________________________________________________
 
 CF_EXTERN_C_END
-
-//________________________________________________________________________________________
-
-#if defined(__cplusplus)
-
-#include <cstdio>
-#include <cstdlib>
-
-struct lsq_delete
-{
-    void operator()(void* x)
-    {
-        if (x) LSQFree(x); x = NULL;
-    }
-};
-
-#endif
 
 //________________________________________________________________________________________
 

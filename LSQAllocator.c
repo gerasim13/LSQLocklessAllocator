@@ -7,12 +7,13 @@
 //
 
 #include "LSQAllocator.h"
-#include <cstdio>
-#include <cstdlib>
 
 //________________________________________________________________________________________
 
-#define USE_DEFAULT_ALLOCATOR 0
+#ifndef USE_DEFAULT_ALLOCATOR
+    #define USE_DEFAULT_ALLOCATOR 0
+#endif
+
 #if !USE_DEFAULT_ALLOCATOR
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wpointer-bool-conversion"
@@ -27,11 +28,15 @@ CFAllocatorRef kLSQLocklessAllocator = NULL;
 //________________________________________________________________________________________
 
 #ifdef NEDMALLOC_H
+    #if defined(__cplusplus)
+        using namespace nedalloc;
+    #endif
+
     #if defined(__cplusplus) && !defined(NO_NED_NAMESPACE)
-        #define ___MALLOC(no, size)   nedalloc::nedmalloc((size_t)size)
-        #define ___CALLOC(no, size)   nedalloc::nedcalloc((size_t)no, (size_t)size)
-        #define ___REALLOC(mem, size) nedalloc::nedrealloc(mem, (size_t)size)
-        #define ___FREE(mem)          nedalloc::nedfree(mem)
+        #define ___MALLOC(no, size)   nedmalloc((size_t)size)
+        #define ___CALLOC(no, size)   nedcalloc((size_t)no, (size_t)size)
+        #define ___REALLOC(mem, size) nedrealloc(mem, (size_t)size)
+        #define ___FREE(mem)          nedfree(mem)
     #else
         #define ___MALLOC(no, size)   nedmalloc((size_t)size)
         #define ___CALLOC(no, size)   nedcalloc((size_t)no, (size_t)size)
@@ -171,11 +176,10 @@ static void * ned_realloc(struct _malloc_zone_t *zone, void *ptr, size_t size)
     return nedrealloc(ptr, size);
 }
 
-static void * ned_destroy(struct _malloc_zone_t *zone)
+static void ned_destroy(struct _malloc_zone_t *zone)
 {
     // This function should never be called.
 	assert(false);
-	return (NULL);
 }
 
 static unsigned ned_batch_malloc(malloc_zone_t *zone, size_t size, void **results, unsigned num_requested)
@@ -207,13 +211,13 @@ static void ned_free_definite_size(malloc_zone_t *zone, void *ptr, size_t size)
 
 static malloc_zone_t * malloc_ned_zone()
 {
-    __zone.size               = (void *)ned_size;
-	__zone.malloc             = (void *)ned_malloc;
-	__zone.calloc             = (void *)ned_calloc;
-	__zone.valloc             = (void *)ned_valloc;
-	__zone.free               = (void *)ned_free;
-	__zone.realloc            = (void *)ned_realloc;
-	__zone.destroy            = (void *)ned_destroy;
+    __zone.size               = ned_size;
+	__zone.malloc             = ned_malloc;
+	__zone.calloc             = ned_calloc;
+	__zone.valloc             = ned_valloc;
+	__zone.free               = ned_free;
+	__zone.realloc            = ned_realloc;
+	__zone.destroy            = ned_destroy;
 	__zone.zone_name          = "nedmalloc_zone";
 	__zone.batch_malloc       = ned_batch_malloc;
 	__zone.batch_free         = ned_batch_free;
@@ -227,8 +231,8 @@ static malloc_zone_t * malloc_ned_zone()
 	__zone_introspect.check                         = ned_check;
 	__zone_introspect.print                         = ned_print;
 	__zone_introspect.log                           = ned_log;
-	__zone_introspect.force_lock                    = (void *)ned_force_lock;
-	__zone_introspect.force_unlock                  = (void *)ned_force_unlock;
+	__zone_introspect.force_lock                    = ned_force_lock;
+	__zone_introspect.force_unlock                  = ned_force_unlock;
 	__zone_introspect.statistics                    = ned_statistics;
 	__zone_introspect.zone_locked                   = ned_zone_locked;
     __zone_introspect.enable_discharge_checking     = ned_enable_discharge_checking;
@@ -337,28 +341,6 @@ struct task_basic_info LSQAllocatorGetMemoryInfo()
 
 //________________________________________________________________________________________
 
-inline void * LSQMalloc (size_t size)
-{
-    return ___MALLOC(no, size);
-}
-
-inline void * LSQCalloc (size_t no, size_t size)
-{
-    return ___CALLOC(no, size);
-}
-
-inline void * LSQRealloc(void *mem, size_t size)
-{
-    return ___REALLOC(mem, size);
-}
-
-inline void LSQFree(void *mem)
-{
-    ___FREE(mem);
-}
-
-//________________________________________________________________________________________
-
 #pragma mark - CFAllocator wrapper
 
 // Set LSQLocklessAllocator to Defaul Allocator
@@ -372,19 +354,25 @@ __attribute__((constructor)) static void LSQAllocator(void)
 
 //________________________________________________________________________________________
 
-#ifdef NEDMALLOC_H
-
-void* operator new(std::size_t sz)
+__inline__ __attribute__((always_inline)) void * LSQMalloc (size_t size)
 {
-    return LSQMalloc(sz);
+    return ___MALLOC(no, size);
 }
 
-void operator delete(void* ptr) noexcept
+__inline__ __attribute__((always_inline)) void * LSQCalloc (size_t no, size_t size)
 {
-    LSQFree(ptr);
+    return ___CALLOC(no, size);
 }
 
-#endif
+__inline__ __attribute__((always_inline)) void * LSQRealloc(void *mem, size_t size)
+{
+    return ___REALLOC(mem, size);
+}
+
+__inline__ __attribute__((always_inline)) void LSQFree(void *mem)
+{
+    ___FREE(mem);
+}
 
 //________________________________________________________________________________________
 
