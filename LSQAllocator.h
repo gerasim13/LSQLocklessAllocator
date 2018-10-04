@@ -29,8 +29,8 @@ CF_EXTERN_C_BEGIN
 #define LSQAllocatorDealloc(ptr)       CFAllocatorDeallocate(kLSQLocklessAllocator, ptr); ptr = NULL;
 #define LSQAllocatorRealloc(ptr, size) CFAllocatorReallocate(kLSQLocklessAllocator, ptr, size, 0);
 
-#define LSQCONSTRUCTOR __attribute((ownership_returns(malloc)))
-#define LSQDESTRUCTOR  __attribute((ownership_takes(malloc, 1)))
+#define LSQCONSTRUCTOR __attribute((ownership_returns(LSQMalloc, 1)))
+#define LSQDESTRUCTOR  __attribute((ownership_takes(LSQMalloc, 1)))
 
 //________________________________________________________________________________________
 
@@ -43,10 +43,10 @@ CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
 CF_EXPORT void                   LSQAllocatorSetCurrentAllocator(CFAllocatorRef); // Allocator setter
 CF_EXPORT struct task_basic_info LSQAllocatorGetMemoryInfo(void);                 // Get memory info
 
-LSQCONSTRUCTOR CF_EXPORT void * LSQMalloc (size_t size);
-LSQCONSTRUCTOR CF_EXPORT void * LSQCalloc (size_t no, size_t size);
-LSQDESTRUCTOR  CF_EXPORT void   LSQFree   (void *mem);
-CF_EXPORT void * LSQRealloc(void *mem, size_t size);
+CF_EXPORT void                * LSQRealloc(void *mem, size_t size);
+CF_EXPORT void LSQCONSTRUCTOR * LSQCalloc (size_t no, size_t size);
+CF_EXPORT void LSQCONSTRUCTOR * LSQMalloc (size_t size);
+CF_EXPORT void LSQDESTRUCTOR    LSQFree   (void *mem);
 
 //________________________________________________________________________________________
 
