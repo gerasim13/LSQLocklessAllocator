@@ -40,9 +40,6 @@ CF_EXPORT CFAllocatorRef kLSQLocklessAllocator;
 
 #pragma mark - Functions
 
-CF_EXPORT void                   LSQAllocatorSetCurrentAllocator(CFAllocatorRef); // Allocator setter
-CF_EXPORT struct task_basic_info LSQAllocatorGetMemoryInfo(void);                 // Get memory info
-
 CF_EXPORT void                * LSQRealloc(void *mem, size_t size);
 CF_EXPORT void LSQCONSTRUCTOR * LSQCalloc (size_t no, size_t size);
 CF_EXPORT void LSQCONSTRUCTOR * LSQMalloc (size_t size);
