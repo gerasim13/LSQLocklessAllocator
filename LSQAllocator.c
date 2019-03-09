@@ -98,11 +98,9 @@ static boolean_t ned_check(malloc_zone_t *zone)
 
 static void ned_print(malloc_zone_t *zone, boolean_t verbose)
 {
-    
 }
 static void ned_log(malloc_zone_t *zone, void *address)
 {
-    
 }
 
 static void ned_force_lock(malloc_zone_t *zone)
@@ -115,7 +113,6 @@ static void ned_force_unlock(malloc_zone_t *zone)
 
 static void ned_statistics(malloc_zone_t *zone, malloc_statistics_t *stats)
 {
-    
 }
 
 static boolean_t ned_zone_locked(malloc_zone_t *zone)
@@ -326,17 +323,6 @@ CFAllocatorRef NewLSQLocklessAllocator()
     // Create allocator
     return CFAllocatorCreate(kCFAllocatorUseContext, &context);
     #endif
-}
-
-struct task_basic_info LSQAllocatorGetMemoryInfo()
-{
-    struct task_basic_info info;
-    mach_msg_type_number_t size = sizeof(info);
-    task_info(mach_task_self(),
-              TASK_BASIC_INFO,
-              (task_info_t)&info,
-              &size);
-    return info;
 }
 
 //________________________________________________________________________________________
